@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Mesto</title>
+  <link rel="stylesheet" href="./index.css">
+</head>
+<body>
+  <div class="root">
+    <h1 class="title">Адресная база</h1>
+    <div class="add-container">
+      <h3 class="add-container__subtitle">Добавить адрес</h3>
+      <form id="formEdit" class="add-container__form" name="newEdit">
+        <input id="nameInput" required min='2' max='30' type="text" name="nameEdit" class="add-container__input" placeholder="Ф.И.О.">
+        <span id="error-name" class="error-message error-hidden"></span>
+        <input id="addressInput" required type="text" name="addressEdit" class="add-container__input" placeholder="Адрес">
+        <span id="error-address" class="error-message error-hidden"></span>
+        <button id="buttonAdd" type="button" class="add-container__button" disabled="true">Добавить</button>
+      </form>
+    </div>
+    <div class="data-container">
+      <div class="data-container__element">
+        <div class="element__info">
+          <p class="info__name"><strong>Имя:</strong> Гуськов Вячеслав Олегович</p>
+          <p class="info__address"><strong>Адрес:</strong> 4-я линия 138</p>
+        </div>
+        <!-- Сделал контейнет, чтобы можно было добавлять функционала по необходимости -->
+        <div class="element__button-container">
+          <button type="button" class="button-container__change">Изменить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="./index.js"></script>
+</body>
+</html>
