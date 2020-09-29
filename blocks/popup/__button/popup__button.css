@@ -1,0 +1,16 @@
+.popup__button {
+  display: block;
+  width: 100px;
+  height: 30px;
+  border: 1px solid rgba(0, 0, 0, .2);
+  margin: 25px auto;
+  color: rgba(0, 0, 0, .2);
+  font-size: 20px;
+}
+
+.edit {
+  width: 51px;
+  height: 17px;
+  font-size: 13px;
+  color: #000;
+}

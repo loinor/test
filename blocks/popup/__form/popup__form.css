@@ -1,0 +1,6 @@
+@import url(./_message/error-hidden.css);
+@import url(./_message/error-message.css);
+
+.popup__form {
+  margin-top: 60px;
+}

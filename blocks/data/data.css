@@ -1,0 +1,10 @@
+@import url(./__element/data__element.css);
+
+.data {
+  width: 100%;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid #A5A5A5;
+}

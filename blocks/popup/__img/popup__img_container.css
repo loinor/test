@@ -1,0 +1,5 @@
+@import url(./popup__img_open.css);
+
+.popup__img_container {
+    position: relative;
+}

@@ -1,109 +1,96 @@
-//В идеале, я бы хотел вынести по модульно, отдельно IndexedDB сформировать как сущность и пользоваться внутри класс Address
+import Popup from './scripts/Popup.js';
+import AddressValidation from './scripts/AddressValidation.js';
 
-let db;
-let request = indexedDB.open("myDB", 1);
 
-request.onupgradeneeded = (event) => {
-  db = event.target.result;
-  let address = db.createObjectStore("users", {autoIncrement: true});
-}
-
-request.onsuccess = (event) => {
-  db = event.target.result;
-}
-
-request.onerror = (event) => {
-  console.log(event.target.errorCode);
-}
-
+const openButton = document.querySelector('#buttonAddMain');
+const closeButton = document.querySelector('.popup__close');
+const popup = document.querySelector('.popup');
 const buttonAdd = document.querySelector('#buttonAdd')
 const nameEditInput = document.querySelector('#nameInput');
-const numberEditInput = document.querySelector('#numberInput');
 const addressEditInput = document.querySelector('#addressInput');
-const errorName = document.querySelector('#error-name');
-const errorNumber = document.querySelector('#error-number');
-const errorAddress = document.querySelector('#error-address');
+const container = document.querySelector('.data');
+const nameInputEditPopup = document.querySelector('#nameInputEdit');
+const addressInputEditPopup = document.querySelector('#addressInputEdit');
+const editClose = document.querySelector('#editClose');
+const addEdit = document.querySelector('#buttonAddEdit');
 
-class Address {
-  constructor() {
-    this.name;
-    this.addres;
-  }
+const classPopup = new Popup;
+const valid = new AddressValidation;
+var addressBook = [];
 
-  editNameFunction = () => {
-    const nameValue = nameEditInput.value;
-  
-    if ( nameValue.length < 2 && nameValue.length !==0 || nameValue.length > 30) {
-      errorName.classList.remove('.error-hidden');
-      errorName.textContent = 'Должно быть от 2 до 30 символов';
-      return false
-    } else if ( nameValue.length === 0) {
-      errorName.classList.remove('.error-hidden');
-      errorName.textContent = 'Это обязательное поле';
-      return false
-    } else {
-      errorName.classList.add('.error-hidden');
-      errorName.textContent = '';
-      this.name = nameValue;
-      return true
-    }
-  }
-
-  editAddressFunction = () => {
-    const addressValue = addressEditInput.value;
-  
-    if ( addressValue.length < 2 && addressValue.length !==0 || addressValue.length > 30) {
-      errorAddress.classList.remove('.error-hidden');
-      errorAddress.textContent = 'Должно быть от 2 до 30 символов';
-      return false
-    } else if ( addressValue.length === 0) {
-      errorAddress.classList.remove('.error-hidden');
-      errorAddress.textContent = 'Это обязательное поле';
-      return false
-    } else {
-      errorAddress.classList.add('.error-hidden');
-      errorAddress.textContent = '';
-      this.address = addressValue;
-      return true
-    }
-  }
-
-  checkValidity = () => {
-    if ( !this.editNameFunction() || !this.editAddressFunction() ) {
-      buttonAdd.setAttribute('disabled', 'true');
-      
-    } else {
-      buttonAdd.removeAttribute('disabled');
-    }
-  }
-  //Здесь немного не доделано, нужно взять объект хранение и через for in пройтись для вложения в DOM
-  getUsers = (db) => {
-    let data = db.transaction(["users"], "readwrite");
-    let dataStore = data.objectStore("users");
-    console.log(dataStore)
-  }
-
-  addAddressDb = (db, name, address) => {
-    let data = db.transaction(["users"], "readwrite");
-    let dataStore = data.objectStore("users");
-    let userAddress = {name: name, address: address};
-    console.log(userAddress)
-    dataStore.add(userAddress);
-    data.oncomplete = () => {
-      console.log('Completed')
-    }
-    data.onerror = (event) => {
-      alert('error storing note ' + event.target.errorCode);
-    }
-  }
-
-  addUser = () => {
-    this.addAddressDb(db, this.name, this.address);
-  }
-
+function jsonStructure(fullname, address){
+  this.fullname = fullname;
+  this.address = address;
 }
 
-let address = new Address;
-nameEditInput.addEventListener('input', address.checkValidity);
-addressEditInput.addEventListener('input', address.checkValidity);
-buttonAdd.addEventListener('click', address.addUser);
+function addToBook(){
+  let obj = new jsonStructure(nameEditInput.value, addressEditInput.value);
+  addressBook.push(obj);
+  localStorage['addbook'] = JSON.stringify(addressBook);
+  showAddressBook();
+  classPopup.close(popup)
+}
+
+function removeEntry(e){
+  if(e.target.classList.contains('delbutton')){
+    var remID = e.target.getAttribute('data-id');
+    addressBook.splice(remID,1);
+    localStorage['addbook'] = JSON.stringify(addressBook);
+    showAddressBook();
+  }
+}
+
+function changeEntry(e){
+  if(e.target.classList.contains('button')){
+    let raw = localStorage.getItem('addbook');
+    let change = JSON.parse(raw);
+    console.log(change, 0)
+    change[0].fullname = nameInputEditPopup.value;
+    change[0].address = addressInputEditPopup.value;
+    localStorage['addbook'] = JSON.stringify(change);
+    showAddressBook();
+    classPopup.close(editPopup)
+  }
+}
+
+function showAddressBook(){
+  if(localStorage['addbook'] === undefined){
+    localStorage['addbook'] = '';
+  } else {
+    addressBook = JSON.parse(localStorage['addbook']);
+    //Я понимаю, что innerHTML не следует использовать с точки зрения безопасности, но для тестового я решил, что пойдет из-за простоты
+    container.innerHTML = '';
+    for(let item in addressBook){
+      let str = '<div class="data__element">';
+        str += '<p class="element__name">' + addressBook[item].fullname + '</p>';
+        str += '<p class="element__address">' + addressBook[item].address + '</p>';
+        str += '<div class="del"><a href="#" class="delbutton" data-id="' + item + '">Delete</a></div>';
+        str += '<button id="buttonEdit" type="button" data-id="' + item + '" class="button popup__button edit">Edit</button>';
+        str += '</div>';
+      container.innerHTML += str;
+    }
+  }
+}
+
+showAddressBook();
+const editPopup = document.querySelector('#popupEdit');
+
+addEdit.addEventListener("click", changeEntry);
+
+buttonAdd.addEventListener("click", addToBook);
+container.addEventListener("click", removeEntry);
+editClose.addEventListener("click", function() {
+  classPopup.close(editPopup)
+})
+container.addEventListener("click", function() {
+  classPopup.open(editPopup)
+})
+openButton.addEventListener("click", function() {
+  classPopup.open(popup);
+});
+closeButton.addEventListener("click", function() {
+  classPopup.close(popup);
+});
+nameEditInput.addEventListener("input", valid.checkValidity);
+addressEditInput.addEventListener("input", valid.checkValidity);
+buttonAdd.addEventListener("click", valid.addUser);
